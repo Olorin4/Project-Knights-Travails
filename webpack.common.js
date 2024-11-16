@@ -5,7 +5,7 @@ module.exports = {
     entry: "./src/index.js",
     plugins: [
         new HtmlWebpackPlugin({
-            title: "Hashmap",
+            title: "Knights Travails",
             template: path.resolve(__dirname, "./src/temp.html"),
         }),
     ],
