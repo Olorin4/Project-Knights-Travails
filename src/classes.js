@@ -9,14 +9,30 @@
     vertices and edges. Instead, you can think of the graph as implicit.
 */
 
-// class Board {
-//     constructor() {
-//         square =
-//     }
-// }
+class Board {
+    constructor(size = 8) {
+        this.size = size; // Default chessboard is 8x8
+    }
+
+    // Method to check if a position is valid on the board
+    isValid([row, col]) {
+        return row >= 0 && row < this.size && col >= 0 && col < this.size;
+    }
+
+    // Method to display the path in a formatted way
+    displayPath(path) {
+        console.log(
+            `You made it in ${path.length - 1} moves! Here's your path:`
+        );
+        path.forEach((position) => console.log(position));
+    }
+}
 
 export function knightMoves(startPosition, endPosition) {
-    // Define possible knight moves as (rowOffset, colOffset) pairs
+    // 1. Create chessboard
+    const board = new Board(); // Create a chessboard instance
+
+    // 2. Define possible knight moves as (rowOffset, colOffset) pairs
     const knightMoves = [
         [-2, -1],
         [-1, -2],
@@ -28,30 +44,34 @@ export function knightMoves(startPosition, endPosition) {
         [-2, 1],
     ];
 
-    // Check if a position is valid on the chessboard
-    const isValidPosition = ([row, col]) =>
-        row >= 0 && row < 8 && col >= 0 && col < 8;
     // Input validation for start and end positions
-    if (!isValidPosition(startPosition) || !isValidPosition(endPosition)) {
-        return "Invalid input: both start and end positions must be within a standard 8x8 chessboard.";
+    if (!board.isValid(startPosition) || !board.isValid(endPosition)) {
+        console.log(
+            "Invalid input: both start and end positions must be within a standard 8x8 chessboard."
+        );
+        return;
     }
 
-    // BFS setup
-    const queue = [[startPosition, [startPosition]]]; // [[currentPosition, pathSoFar]]
-    const visited = new Set(); // Store visited positions as strings for simplicity
-    const toKey = ([row, col]) => `${row},${col}`; // Convert positions to a unique string for visited tracking
+    // Create a 2D array to track visited positions
+    const visited = Array.from({ length: board.size }, () =>
+        Array(board.size).fill(false)
+    );
 
-    // Start BFS traversal
+    // Queue for BFS: stores [currentPosition, pathSoFar]
+    const queue = [[startPosition, [startPosition]]];
+
+    // BFS traversal
     while (queue.length > 0) {
-        const [currentPosition, path] = queue.shift();
+        const [currentPosition, path] = queue.shift(); // Dequeue the first element
         const [currentRow, currentCol] = currentPosition;
-        // If the current position matches the target, return the path
+        // If we reach the end position, display the path and exit
         if (currentRow === endPosition[0] && currentCol === endPosition[1]) {
-            return path;
+            board.displayPath(path);
+            return;
         }
 
         // Mark the current position as visited
-        visited.add(toKey(currentPosition));
+        visited[currentRow][currentCol] = true;
 
         // Explore all valid knight moves from the current position
         for (const [rowOffset, colOffset] of knightMoves) {
@@ -59,16 +79,11 @@ export function knightMoves(startPosition, endPosition) {
                 currentRow + rowOffset,
                 currentCol + colOffset,
             ];
-
-            if (
-                isValidPosition(nextPosition) &&
-                !visited.has(toKey(nextPosition))
-            ) {
+            const [nextRow, nextCol] = nextPosition;
+            // Add the position to the queue if it's valid and not yet visited
+            if (board.isValid(nextPosition) && !visited[nextRow][nextCol]) {
                 queue.push([nextPosition, [...path, nextPosition]]);
             }
         }
     }
-
-    // If no path is found (which shouldn't happen on a valid chessboard), return an empty array
-    return [];
 }
