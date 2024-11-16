@@ -16,14 +16,7 @@
 // }
 
 export function knightMoves(startPosition, endPosition) {
-    /* Shows the shortest possible way to get from one square to another by outputting
-    all squares the knight will stop along the way. Will dynamically explore all 
-    possible moves (edges) to other vertices (positions on the board) as it traverses the
-    board. */
-
-    // 1. Create 8x8 board with 64 squares, each square having axb coordinates
-    /*  2. Create rule for the movement of the knight
-    Define possible knight moves as (rowOffset, colOffset) pairs */
+    // Define possible knight moves as (rowOffset, colOffset) pairs
     const knightMoves = [
         [-2, -1],
         [-1, -2],
@@ -34,16 +27,20 @@ export function knightMoves(startPosition, endPosition) {
         [-1, 2],
         [-2, 1],
     ];
+
     // Check if a position is valid on the chessboard
     const isValidPosition = ([row, col]) =>
         row >= 0 && row < 8 && col >= 0 && col < 8;
-    // 3. Traverse all possible moves from the current square to other squares, choose a  data structure that will allow you to work with every possible move. Decide which search algorithm is best to use for this case
-    // 4. Use the chosen search algorithm to find the shortest path between the starting square (or node) and the ending square.
+    // Input validation for start and end positions
+    if (!isValidPosition(startPosition) || !isValidPosition(endPosition)) {
+        return "Invalid input: both start and end positions must be within a standard 8x8 chessboard.";
+    }
+
     // BFS setup
     const queue = [[startPosition, [startPosition]]]; // [[currentPosition, pathSoFar]]
-    const visited = new Set();
-    // Convert positions to a unique string for visited tracking
-    const toKey = ([row, col]) => `${row},${col}`;
+    const visited = new Set(); // Store visited positions as strings for simplicity
+    const toKey = ([row, col]) => `${row},${col}`; // Convert positions to a unique string for visited tracking
+
     // Start BFS traversal
     while (queue.length > 0) {
         const [currentPosition, path] = queue.shift();
